@@ -82,14 +82,14 @@
         <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/button">
+                android:layout_below="@+id/button1">
 
                 <TextView
                     android:id="@+id/resultTextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:padding="10dp"
-                    android:textColor="#ffffffff"
+                    android:textColor="#000000"
                     android:textSize="20sp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"

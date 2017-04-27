@@ -103,7 +103,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         cityName = (EditText) findViewById(R.id.cityName);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
-        playMusic();
+
     }
 
     @Override
@@ -323,17 +323,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 if (weather != "" && description != "") {
                     assert description != null;
                     if (description.toLowerCase().contains("rain")) {
-                        message += "There's going to be rain today." + "\r\n";
+                        message += "There's going to be rain later today. ";
+                        message += "Don't forget your rain shoes and an umbrella!";
+                        playMusic();
                     }
                 }
                 if (weather != "" && description != "") {
-                    if (description != null && description.toLowerCase().contains("rain")) {
-                        message += "There's not going to be rain today." + "\r\n";
+                    if (description != null && !description.toLowerCase().contains("rain") && description.toLowerCase().contains("sunny")) {
+                        message += "It's going to be sunny today." + "\r\n";
                     }
                 }
                 if (weather != "" && description != "") {
                     if (description != null && description.toLowerCase().contains("snow")) {
-                        message += "There's going to be snow today." + "\r\n";
+                        message += "There's going to be snow later today." + "\r\n";
                     }
                 }
 
