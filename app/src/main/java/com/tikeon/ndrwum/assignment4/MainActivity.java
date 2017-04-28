@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +48,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.StringTokenizer;
 
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, MediaPlayer.OnPreparedListener {
@@ -58,34 +63,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private LocationRequest mLocationRequest;
     Location loc;
-
-    public void findWeather(View view) {
-
-        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        mgr.hideSoftInputFromWindow(cityName.getWindowToken(), 0);
-
-        try {
-            String encodedCityName = URLEncoder.encode(cityName.getText().toString(), "UTF-8");
-            String encodedLatitude = URLEncoder.encode(String.valueOf(loc.getLatitude()), "UTF-8");
-            String encodedLongitude = URLEncoder.encode(String.valueOf(loc.getLongitude()), "UTF-8");
-
-            DownloadTask task = new DownloadTask();
-            if (encodedCityName!="") {
-                task.execute("http://api.openweathermap.org/data/2.5/forecast?q=" + encodedCityName + "&" + "appid=df25a7ba0fc76dce7171effa6c0cedd3");
-            } else if (loc!=null){
-                task.execute("http://api.openweathermap.org/data/2.5/forecast?lat=" + encodedLatitude + "&" + "lon=" + encodedLongitude + "appid=df25a7ba0fc76dce7171effa6c0cedd3");
-            }
-
-        } catch (UnsupportedEncodingException e) {
-
-            e.printStackTrace();
-
-            Toast.makeText(getApplicationContext(), "Could not find weather", Toast.LENGTH_LONG).show();
-
-        }
-
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,19 +103,222 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location) {
         loc=location;
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 7);
         mMap.animateCamera(cameraUpdate);
     }
 
-    public void playMusic() {
+    public void findWeather(View view) {
+        resultTextView.setText("");
+        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(cityName.getWindowToken(), 0);
+
+        try {
+            String encodedCityName = URLEncoder.encode(cityName.getText().toString(), "UTF-8");
+            String encodedLatitude = URLEncoder.encode(String.valueOf(loc.getLatitude()), "UTF-8");
+            String encodedLongitude = URLEncoder.encode(String.valueOf(loc.getLongitude()), "UTF-8");
+
+            DownloadTask task = new DownloadTask();
+            if (!encodedCityName.equals("")) {
+                task.execute("http://api.openweathermap.org/data/2.5/forecast?q=" + encodedCityName + "&appid=df25a7ba0fc76dce7171effa6c0cedd3"+"&mode=json");
+            } else if (loc!=null){
+                task.execute("http://api.openweathermap.org/data/2.5/forecast?lat=" + encodedLatitude + "&lon=" + encodedLongitude + "&appid=df25a7ba0fc76dce7171effa6c0cedd3");
+            }
+
+        } catch (UnsupportedEncodingException e) {
+
+            e.printStackTrace();
+
+            Toast.makeText(getApplicationContext(), "Could not find weather: 1", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void playMusic(int i) {
         String sss = "https://www.partnersinrhyme.com/pir/libs/media/Analog_Boys_2.wav";
         if (mPlayer == null || !mPlayer.isPlaying()) {
             mPlayer = new MediaPlayer();
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
-                mPlayer.setDataSource(sss);
+                if (i==1) {
+                    mPlayer.setDataSource(sss);
+                }
+                if (i==2) {
+                    mPlayer.setDataSource(sss);
+                }
+                if (i==3) {
+                    mPlayer.setDataSource(sss);
+                }
+                if (i==4) {
+                    mPlayer.setDataSource(sss);
+                }
+                if (i==5) {
+                    mPlayer.setDataSource(sss);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            mPlayer.prepareAsync();
+            mPlayer.setOnPreparedListener(this);
+        }
+    }
+
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            String result = "";
+            URL url;
+            HttpURLConnection urlConnection = null;
+
+            try {
+                url = new URL(urls[0]);
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                InputStream in = urlConnection.getInputStream();
+
+                InputStreamReader reader = new InputStreamReader(in);
+
+                int data = reader.read();
+
+                while (data != -1) {
+
+                    char current = (char) data;
+
+                    result += current;
+
+                    data = reader.read();
+
+                }
+
+                return result;
+
+            } catch (Exception e) {
+
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Could not find weather", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+            }
+
+            return null;
+        }
+
+        /*Parsing JSON weather info from API*/
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            Double f_temp=null;
+            String weather = null;
+            String description = null;
+            try {
+
+                String message = "";
+
+                JSONObject jsonObject = (JSONObject) new JSONTokener(result).nextValue();
+
+                String weatherInfo = jsonObject.getString("list");
+
+                JSONArray arr = new JSONArray(weatherInfo);
+            /*    String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                currentDateTimeString = new SimpleDateFormat("MMM dd ha").format(new Date());
+                Log.d("systime", currentDateTimeString);*/
+
+
+                for (int i = 0; i < 4; i++) {
+
+                    JSONObject tmp = arr.getJSONObject(i);
+                    JSONObject temp1 = tmp.getJSONObject("main");
+                    String temp = temp1.getString("temp");
+                    String date_time = tmp.getString("dt_txt");
+                    temp = String.valueOf(Double.valueOf(temp) * 9/5 - 459.67);
+                    f_temp=Double.valueOf(temp);
+                    Log.d("temp", f_temp.toString());
+                    StringTokenizer token = new StringTokenizer(date_time);
+                    String date1 = token.nextToken();
+                    String time1 = token.nextToken();
+                    SimpleDateFormat d_input = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat t_input = new SimpleDateFormat("HH:mm:ss");
+                    SimpleDateFormat d_output = new SimpleDateFormat("MMM dd");
+                    SimpleDateFormat t_output = new SimpleDateFormat("ha");
+                    Date dt, dt2;
+                    try {
+                        dt = d_input.parse(date1);
+                        dt2 = t_input.parse(time1);
+                        date1 = d_output.format(dt);
+                        time1 = t_output.format(dt2);
+                        Log.d("time", date1+" "+time1);
+                    } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                    weather = tmp.getString("weather");
+                    JSONArray mainWeather = new JSONArray(weather);
+
+                    for (int j = 0; j < mainWeather.length(); j++) {
+                        tmp = mainWeather.getJSONObject(j);
+                        weather += tmp.getString("main");
+                        description += tmp.getString("description");
+                    }
+                }
+
+                /*Weather Conditionals*/
+                if (weather != "" && description != "") {
+                    assert description != null;
+                    description= description.toLowerCase();
+                    if (description.contains("rain")) {
+                        message += "There's going to be rain later today. ";
+                        message += "So don't forget your rain shoes and an umbrella!" + "\r\n";
+                        playMusic(1);
+                    }
+                    if (description.contains("snow")) {
+                        message += "There's going to be snow later today. ";
+                        message += "So don't forget to wear snow boots!" + "\r\n";
+                        playMusic(2);
+                    }
+                    if (description.contains("windy")) {
+                        message += "It's going to be windy later today. ";
+                        if(f_temp>70) {
+                            message += "But it's going to be pretty warm today! " ;
+                            message += "So don't forget to wear a hat, sunscreen and keep hydrated!"+ "\r\n";
+                        }
+                        playMusic(3);
+                    }
+                    if (description.contains("clouds")) {
+                        message += "It's going to be cloudy today."+"\r\n";
+                        if(f_temp>70) {
+                            message += "But it's going to be pretty warm today! ";
+                            message += "So don't forget to wear a hat, sunscreen and keep hydrated!" + "\r\n";
+                        }
+                        playMusic(4);
+                    }
+                    if(f_temp<60) {
+                        message += "A bit chilly today so don't forget to wear warm clothes!" + "\r\n";
+                    }
+                    else {
+                        message += "It's going to be clear weather today! ";
+                        if(f_temp>70){
+                            message += "But it's going to be pretty warm today! " ;
+                            message += "So don't forget to wear a hat, sunscreen and keep hydrated"+ "\r\n";
+                        }
+                        playMusic(5);
+                    }
+                }
+
+
+                /*No Weather Data Retrieved*/
+                if (message != "") {
+                    resultTextView.setText(message);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Could not find weather: 2", Toast.LENGTH_LONG).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Could not find weather : 3", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -232,133 +412,5 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private class DownloadTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... urls) {
-
-            String result = "";
-            URL url;
-            HttpURLConnection urlConnection = null;
-
-            try {
-                url = new URL(urls[0]);
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-
-                InputStream in = urlConnection.getInputStream();
-
-                InputStreamReader reader = new InputStreamReader(in);
-
-                int data = reader.read();
-
-                while (data != -1) {
-
-                    char current = (char) data;
-
-                    result += current;
-
-                    data = reader.read();
-
-                }
-
-                return result;
-
-            } catch (Exception e) {
-
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "Could not find weather", Toast.LENGTH_LONG).show();
-                    }
-                });
-
-
-            }
-
-            return null;
-        }
-
-        /*Parsing JSON weather info from API*/
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            String weather = null;
-            String description = null;
-            try {
-
-                String message = "";
-
-                JSONObject jsonObject = (JSONObject) new JSONTokener(result).nextValue();
-
-                String weatherInfo = jsonObject.getString("list");
-
-                JSONArray arr = new JSONArray(weatherInfo);
-
-                for (int i = 0; i < arr.length(); i++) {
-
-                    JSONObject tmp = arr.getJSONObject(i);
-
-                    weather = tmp.getString("weather");
-
-                    JSONArray mainWeather = new JSONArray(weather);
-
-                    for (int j = 0; j < mainWeather.length(); j++) {
-
-                        tmp = mainWeather.getJSONObject(j);
-
-                        weather += tmp.getString("main");
-
-                        description += tmp.getString("description");
-
-                    }
-
-
-                }
-
-                /*Weather Conditionals*/
-                if (weather != "" && description != "") {
-                    assert description != null;
-                    if (description.toLowerCase().contains("rain")) {
-                        message += "There's going to be rain later today. ";
-                        message += "Don't forget your rain shoes and an umbrella!";
-                        playMusic();
-                    }
-                }
-                if (weather != "" && description != "") {
-                    if (description != null && !description.toLowerCase().contains("rain") && description.toLowerCase().contains("sunny")) {
-                        message += "It's going to be sunny today." + "\r\n";
-                    }
-                }
-                if (weather != "" && description != "") {
-                    if (description != null && description.toLowerCase().contains("snow")) {
-                        message += "There's going to be snow later today." + "\r\n";
-                    }
-                }
-
-                /*No Weather Data Retrieved*/
-                if (message != "") {
-
-                    resultTextView.setText(message);
-
-                } else {
-
-                    Toast.makeText(getApplicationContext(), "Could not find weather", Toast.LENGTH_LONG).show();
-
-                }
-
-
-            } catch (JSONException e) {
-
-                Toast.makeText(getApplicationContext(), "Could not find weather", Toast.LENGTH_LONG).show();
-
-            }
-
-
-        }
-    }
-}
+    }}
 
