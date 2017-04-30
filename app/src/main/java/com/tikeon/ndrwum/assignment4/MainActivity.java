@@ -50,7 +50,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 
@@ -216,6 +218,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             Double f_temp=null;
             String weather = null;
             String description = null;
+            List temp_list = new ArrayList<String>();
             try {
 
                 String message = "";
@@ -235,10 +238,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     JSONObject tmp = arr.getJSONObject(i);
                     JSONObject temp1 = tmp.getJSONObject("main");
                     String temp = temp1.getString("temp");
+
+                    temp_list.add(temp1.get("temp"));
                     String date_time = tmp.getString("dt_txt");
                     temp = String.valueOf(Double.valueOf(temp) * 9/5 - 459.67);
                     f_temp=Double.valueOf(temp);
-                    Log.d("temp", f_temp.toString());
                     StringTokenizer token = new StringTokenizer(date_time);
                     String date1 = token.nextToken();
                     String time1 = token.nextToken();
@@ -268,6 +272,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                 /*Weather Conditionals*/
                 if (weather != "" && description != "") {
+                    message+= "It is currently " + String.valueOf((int)((Double) temp_list.get(0) * 9/5 - 459.67)) + " degrees. ";
                     assert description != null;
                     description= description.toLowerCase();
                     if (description.contains("rain")) {
@@ -296,10 +301,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         playMusic(4);
                     }
-                    if(f_temp<60) {
-                        message += "A bit chilly today so don't forget to wear warm clothes!" + "\r\n";
-                    }
-                    else {
+                    else{
                         message += "It's going to be clear weather today! ";
                         if(f_temp>70){
                             message += "But it's going to be pretty warm today! " ;
@@ -307,6 +309,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         playMusic(5);
                     }
+                    if(f_temp<60) {
+                        message += "A bit chilly today so don't forget to wear warm clothes!" + "\r\n";
+                    }
+
                 }
 
 
