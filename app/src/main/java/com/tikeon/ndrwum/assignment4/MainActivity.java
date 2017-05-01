@@ -58,13 +58,18 @@ import java.util.StringTokenizer;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, MediaPlayer.OnPreparedListener {
 
-    private static MediaPlayer mPlayer;
+    final MediaPlayer mPlayer;
     protected GoogleApiClient mGoogleApiClient;
     EditText cityName;
     TextView resultTextView;
     private GoogleMap mMap;
     private LocationRequest mLocationRequest;
     Location loc;
+    boolean played = false;
+
+    public MainActivity() {
+        mPlayer = new MediaPlayer();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,29 +140,34 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void playMusic(int i) {
-        String sss = "https://www.partnersinrhyme.com/pir/libs/media/Analog_Boys_2.wav";
-        if (mPlayer == null || !mPlayer.isPlaying()) {
-            mPlayer = new MediaPlayer();
+        String two = "https://www.partnersinrhyme.com/pir/libs/media/Analog_Boys_2.wav";
+        String one = "https://www.partnersinrhyme.com/pir/libs/media/FANTASY.wav";
+        String three = "https://www.partnersinrhyme.com/pir/libs/media/FLOAT1.wav";
+        String four = "https://www.partnersinrhyme.com/pir/libs/media/FU2.wav";
+        String five = "https://www.partnersinrhyme.com/pir/libs/media/GOML1.wav";
+        if (!mPlayer.isPlaying()) {
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
+                mPlayer.reset();
                 if (i==1) {
-                    mPlayer.setDataSource(sss);
+                    mPlayer.setDataSource(one);
                 }
-                if (i==2) {
-                    mPlayer.setDataSource(sss);
+                else if (i==2) {
+                    mPlayer.setDataSource(two);
                 }
-                if (i==3) {
-                    mPlayer.setDataSource(sss);
+                else if (i==3) {
+                    mPlayer.setDataSource(three);
                 }
-                if (i==4) {
-                    mPlayer.setDataSource(sss);
+                else if (i==4) {
+                    mPlayer.setDataSource(four);
                 }
-                if (i==5) {
-                    mPlayer.setDataSource(sss);
+                else if (i==5) {
+                    mPlayer.setDataSource(five);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            played=true;
             mPlayer.prepareAsync();
             mPlayer.setOnPreparedListener(this);
         }
@@ -331,7 +341,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        mPlayer.start();
+        mp.start();
     }
 
     @Override
