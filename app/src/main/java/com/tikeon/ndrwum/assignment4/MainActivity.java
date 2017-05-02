@@ -23,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -42,7 +44,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -59,7 +60,7 @@ import java.util.StringTokenizer;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, MediaPlayer.OnPreparedListener {
 
-    final MediaPlayer mPlayer;
+    private static MediaPlayer mPlayer2;
     protected GoogleApiClient mGoogleApiClient;
     EditText cityName;
     TextView resultTextView;
@@ -67,9 +68,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private LocationRequest mLocationRequest;
     Location loc;
+    GlideDrawableImageViewTarget imageViewTarget;
 
     public MainActivity() {
-        mPlayer = new MediaPlayer();
+        mPlayer2 = new MediaPlayer();
     }
 
     @Override
@@ -89,8 +91,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         cityName = (EditText) findViewById(R.id.cityName);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
         weatherGif = (ImageView) findViewById(R.id.gifImg);
-        weatherGif.setImageResource(R.drawable.cloud);
-
+        imageViewTarget = new GlideDrawableImageViewTarget(weatherGif);
     }
 
     @Override
@@ -143,35 +144,29 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void playMusic(int i) {
-        String two = "https://www.partnersinrhyme.com/pir/libs/media/Analog_Boys_2.wav";
-        String one = "https://www.partnersinrhyme.com/pir/libs/media/FANTASY.wav";
-        String three = "https://www.partnersinrhyme.com/pir/libs/media/FLOAT1.wav";
-        String four = "https://www.partnersinrhyme.com/pir/libs/media/FU2.wav";
-        String five = "https://www.partnersinrhyme.com/pir/libs/media/GOML1.wav";
-        if (!mPlayer.isPlaying()) {
-            mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-                mPlayer.reset();
-                if (i==1) {
-                    mPlayer.setDataSource(one);
-                }
-                else if (i==2) {
-                    mPlayer.setDataSource(two);
-                }
-                else if (i==3) {
-                    mPlayer.setDataSource(three);
-                }
-                else if (i==4) {
-                    mPlayer.setDataSource(four);
-                }
-                else if (i==5) {
-                    mPlayer.setDataSource(five);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (!mPlayer2.isPlaying()) {
+            mPlayer2.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mPlayer2.reset();
+            if (i==2) {
+                mPlayer2=MediaPlayer.create(MainActivity.this, R.raw.engsnow);
+                mPlayer2.start();
             }
-            mPlayer.prepareAsync();
-            mPlayer.setOnPreparedListener(this);
+            else if (i==3) {
+                mPlayer2=MediaPlayer.create(MainActivity.this, R.raw.engwind);
+                mPlayer2.start();
+            }
+            else if (i==4) {
+                mPlayer2=MediaPlayer.create(MainActivity.this, R.raw.engsun);
+                mPlayer2.start();
+            }
+            else if (i==5) {
+                mPlayer2=MediaPlayer.create(MainActivity.this, R.raw.engsun);
+                mPlayer2.start();
+            }
+            else if (i==1) {
+                mPlayer2=MediaPlayer.create(MainActivity.this, R.raw.engrain);
+                mPlayer2.start();
+            }
         }
     }
 
@@ -287,48 +282,54 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     message+= "It is currently " + String.valueOf((int)((Double) temp_list.get(0) * 9/5 - 459.67)) + " degrees. ";
                     assert description != null;
                     description= description.toLowerCase();
-                    if (description.contains("rain")) {
-                        message += "There's going to be rain later today. ";
-                        message += "So don't forget your rain shoes and an umbrella!" + "\r\n";
-                        weatherGif.setImageResource(R.drawable.rain);
-                        playMusic(1);
-                    }
+
                     if (description.contains("snow")) {
                         message += "There's going to be snow later today. ";
                         message += "So don't forget to wear snow boots!" + "\r\n";
-                        weatherGif.setImageResource(R.drawable.snow);
+                        Glide.with(getApplicationContext()).load(R.drawable.snow).into(imageViewTarget);
                         playMusic(2);
+                    }
+                    if (description.contains("clouds")) {
+                        message += "It's going to be cloudy later today."+"\r\n";
+                        Glide.with(getApplicationContext()).load(R.drawable.cloud).into(imageViewTarget);
+                        if(f_temp>70) {
+                            message += "But it's going to be pretty warm later today! ";
+                            message += "So don't forget to wear a hat, sunscreen and keep hydrated!" + "\r\n";
+                            Glide.with(getApplicationContext()).load(R.drawable.sunhat).into(imageViewTarget);
+                            playMusic(5);
+                        }
+
+                    }
+
+                    else{
+                        message += "It's going to be clear weather later today! ";
+                        if(f_temp>70){
+                            message += "But it's going to be pretty warm later today! " ;
+                            message += "So don't forget to wear a hat, sunscreen and keep hydrated!"+ "\r\n";
+                            Glide.with(getApplicationContext()).load(R.drawable.sunhat).into(imageViewTarget);
+                            playMusic(5);
+                        }
+
                     }
                     if (description.contains("windy")) {
                         message += "It's going to be windy later today. ";
                         if(f_temp>70) {
-                            message += "But it's going to be pretty warm today! " ;
+                            message += "But it's going to be pretty warm later today! " ;
                             message += "So don't forget to wear a hat, sunscreen and keep hydrated!"+ "\r\n";
-                            weatherGif.setImageResource(R.drawable.windy);
+                            Glide.with(getApplicationContext()).load(R.drawable.windy).into(imageViewTarget);
                         }
                         playMusic(3);
                     }
-                    if (description.contains("clouds")) {
-                        message += "It's going to be cloudy today."+"\r\n";
-                        weatherGif.setImageResource(R.drawable.cloud);
-                        if(f_temp>70) {
-                            message += "But it's going to be pretty warm today! ";
-                            message += "So don't forget to wear a hat, sunscreen and keep hydrated!" + "\r\n";
-                            weatherGif.setImageResource(R.drawable.sunhat);
-                        }
-                        playMusic(4);
+                    if (description.contains("rain")) {
+                        message += "There's going to be rain later today. ";
+                        message += "So don't forget your rain shoes and an umbrella!" + "\r\n";
+                        Glide.with(getApplicationContext()).load(R.drawable.rain).into(imageViewTarget);
+                        playMusic(1);
                     }
-                    else{
-                        message += "It's going to be clear weather today! ";
-                        if(f_temp>70){
-                            message += "But it's going to be pretty warm today! " ;
-                            message += "So don't forget to wear a hat, sunscreen and keep hydrated"+ "\r\n";
-                            weatherGif.setImageResource(R.drawable.sunhat);
-                        }
-                        playMusic(5);
-                    }
+
                     if(f_temp<60) {
-                        message += "A bit chilly today so don't forget to wear warm clothes!" + "\r\n";
+                        message += "A bit chilly later today so don't forget to wear warm clothes!" + "\r\n";
+                        Glide.with(getApplicationContext()).load(R.drawable.windy).into(imageViewTarget);
                     }
 
                 }
@@ -349,14 +350,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        mp.start();
+        mPlayer2.start();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mPlayer != null) {
-            mPlayer.stop();
+        if (mPlayer2 != null) {
+            mPlayer2.stop();
         }
         mGoogleApiClient.disconnect();
     }
@@ -371,8 +372,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onResume() {
         super.onResume();
-        if (mPlayer != null) {
-            mPlayer.start();
+        if (mPlayer2 != null) {
+            mPlayer2.start();
+            mPlayer2.start();
         }
         if (mGoogleApiClient.isConnected()) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -386,8 +388,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onPause() {
         super.onPause();
-        if (mPlayer != null) {
-            mPlayer.pause();
+        if (mPlayer2 != null) {
+            mPlayer2.pause();
+            mPlayer2.pause();
         }
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 

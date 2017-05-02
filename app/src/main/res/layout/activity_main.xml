@@ -9,8 +9,7 @@
         android:id="@+id/imageView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@drawable/bg"
-        />
+        android:background="@drawable/bg" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,88 +19,99 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                tools:context="com.tikeon.ndrwum.assignment4.MainActivity"
+                android:layout_margin="20dp"
                 android:layout="@layout/activity_main"
-                android:layout_margin="20dp"/>
+                tools:context="com.tikeon.ndrwum.assignment4.MainActivity" />
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/map"
                 android:layout_marginBottom="30dp"
                 android:text="Enter city, state..."
-                android:textColor="#FFFFFFFF"
-                android:textSize="30sp"
                 android:textAlignment="center"
-                android:layout_below="@+id/map"/>
+                android:textColor="#FFFFFFFF"
+                android:textSize="30sp" />
 
             <EditText
                 android:id="@+id/cityName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/textView"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_below="@+id/textView"
                 android:textColor="#000000"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:onClick="findWeather"
-                android:text="Search"
                 android:layout_below="@+id/cityName"
                 android:layout_centerInParent="true"
-                />
+                android:layout_marginTop="10dp"
+                android:onClick="findWeather"
+                android:text="Search" />
+
             <TextView
+                android:id="@+id/or"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/or"
-                android:text="or"
-                android:textSize="20sp"
-                android:textColor="#FFFFFFFF"
                 android:layout_below="@+id/button"
-                android:textAlignment="center"/>
+                android:text="or"
+                android:textAlignment="center"
+                android:textColor="#FFFFFFFF"
+                android:textSize="20sp" />
+
             <Button
                 android:id="@+id/button1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/or"
+                android:layout_centerInParent="true"
                 android:layout_marginBottom="10dp"
                 android:onClick="findWeather"
-                android:text="Current Location"
-                android:layout_centerInParent="true"
-                android:layout_below="@+id/or"/>
+                android:text="Current Location" />
 
-        <android.support.v4.widget.NestedScrollView
+            <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/button1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/resultTextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="10dp"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:background="@drawable/rounded_corner"
+                    android:padding="10dp"
+                    android:textColor="#ffffff"
+                    android:textSize="20sp"
 
                     />
-            <ImageView
-                android:id="@+id/gifImg"
-                android:layout_width="100px"
-                android:layout_height="100px" />
-        </android.support.v4.widget.NestedScrollView>
+
+                <ImageView
+                    android:id="@+id/gifImg"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_below="@id/resultTextView"
+                    android:layout_centerInParent="true" />
+                </RelativeLayout>
+            </android.support.v4.widget.NestedScrollView>
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>
