@@ -97,6 +97,10 @@
                     android:background="@drawable/rounded_corner"
 
                     />
+            <ImageView
+                android:id="@+id/gifImg"
+                android:layout_width="100px"
+                android:layout_height="100px" />
         </android.support.v4.widget.NestedScrollView>
         </RelativeLayout>
     </ScrollView>

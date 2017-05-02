@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +63,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected GoogleApiClient mGoogleApiClient;
     EditText cityName;
     TextView resultTextView;
+    ImageView weatherGif;
     private GoogleMap mMap;
     private LocationRequest mLocationRequest;
     Location loc;
@@ -86,6 +88,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         cityName = (EditText) findViewById(R.id.cityName);
         resultTextView = (TextView) findViewById(R.id.resultTextView);
+        weatherGif = (ImageView) findViewById(R.id.gifImg);
+        weatherGif.setImageResource(R.drawable.cloud);
 
     }
 
@@ -286,11 +290,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     if (description.contains("rain")) {
                         message += "There's going to be rain later today. ";
                         message += "So don't forget your rain shoes and an umbrella!" + "\r\n";
+                        weatherGif.setImageResource(R.drawable.rain);
                         playMusic(1);
                     }
                     if (description.contains("snow")) {
                         message += "There's going to be snow later today. ";
                         message += "So don't forget to wear snow boots!" + "\r\n";
+                        weatherGif.setImageResource(R.drawable.snow);
                         playMusic(2);
                     }
                     if (description.contains("windy")) {
@@ -298,14 +304,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         if(f_temp>70) {
                             message += "But it's going to be pretty warm today! " ;
                             message += "So don't forget to wear a hat, sunscreen and keep hydrated!"+ "\r\n";
+                            weatherGif.setImageResource(R.drawable.windy);
                         }
                         playMusic(3);
                     }
                     if (description.contains("clouds")) {
                         message += "It's going to be cloudy today."+"\r\n";
+                        weatherGif.setImageResource(R.drawable.cloud);
                         if(f_temp>70) {
                             message += "But it's going to be pretty warm today! ";
                             message += "So don't forget to wear a hat, sunscreen and keep hydrated!" + "\r\n";
+                            weatherGif.setImageResource(R.drawable.sunhat);
                         }
                         playMusic(4);
                     }
@@ -314,6 +323,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         if(f_temp>70){
                             message += "But it's going to be pretty warm today! " ;
                             message += "So don't forget to wear a hat, sunscreen and keep hydrated"+ "\r\n";
+                            weatherGif.setImageResource(R.drawable.sunhat);
                         }
                         playMusic(5);
                     }
