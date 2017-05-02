@@ -65,7 +65,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private LocationRequest mLocationRequest;
     Location loc;
-    boolean played = false;
 
     public MainActivity() {
         mPlayer = new MediaPlayer();
@@ -167,7 +166,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            played=true;
             mPlayer.prepareAsync();
             mPlayer.setOnPreparedListener(this);
         }
