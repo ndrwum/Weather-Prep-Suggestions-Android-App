@@ -1,3 +1,3 @@
 # Weather-Prep-Suggestions-Android-App
-Final Project for COMP 590. 
+Youtube link: https://youtu.be/_LJbvw5Fli0  
 The Weather Prep Suggestions app is an app with the prime objective of the app  to save time and human efforts by offering suggestions on what to bring and wear based on the weather that is forecasted for the next six hours. Instead of having to get out of the warm comfy bed in the morning to go outside and feel the temperature to determine whether it’s cold enough to have to wear winter clothes, the user can simply open the Weather Prep Suggestions App that will tell the user the current temperature and that it will be cold enough to need to wear warm clothes. The user can search for a certain city or the current location and it will show weather data based on the location. 
